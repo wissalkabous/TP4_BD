@@ -1,0 +1,120 @@
+[Q2]:	create table usine (
+  2  NU number(10) Primary key,
+  3  NomU varchar2(30),
+  4  ville varchar2(30)
+  5  );
+
+create table produit (
+  2  NP number(10) primary key,
+  3  NomP varchar2(30),
+  4  Couleur varchar(30),
+  5  Poids number(10)
+  6  );
+
+create table Fournisseur(
+  2      NF number primary key,
+  3      NomF varchar2(30),
+  4      Statut varchar2(30),
+  5      Ville varchar2(30)
+  6      );
+
+Table created.
+
+ create table Livraison(
+  2      NP number(10) CONSTRAINT NP_1 REFERENCES produit(NP),
+  3      NU number(10) CONSTRAINT NU_2 REFERENCES usine(NU),
+  4      NF number(10) CONSTRAINT NF_3 REFERENCES Fournisseur(NF),
+  5      quantite number(20)
+  6     );
+
+Table created.
+
+[Q3]:	Insertion da la table USINE:
+	insert into usine values(001, 'Usine1', 'Casa');
+	insert into usine values(002, 'Usine2', 'Safi');
+	insert into usine values(003, 'Usine3', 'Agadir');
+
+	Insertion da la table PRODUIT:
+	insert into produit values(001, 'Produit1', 'Red', 8);
+	insert into produit values(002, 'Produit2', 'Blue', 10);
+	insert into produit values(003, 'Produit3', 'Purple', 5);
+
+	Insertion da la table FOURNISSEUR:
+	insert into fournisseur values(001, 'Fournissueur1', 'Dispo', 'Agadir');
+	insert into fournisseur values(002, 'Fournissueur2', 'Indispo', 'Casa');
+	insert into fournisseur values(003, 'Fournissueur3', 'Indispo', 'Safi');
+
+	Insertion da la table LIVRAISON:
+	insert into livraison values(001, 001, 001, 3);
+	insert into livraison values(002, 002, 002, 6);
+	insert into livraison values(003, 003, 003, 9);
+
+[Q4]:	select upper(NomU), upper(Ville) from usine;
+
+[Q5]:	select NU, NomU, Ville from usine
+	where NomU like '%plast%';
+
+[Q6]:	 select NF from livraison
+	where NU=001;
+
+[Q7]:	 select nomf from livraison natural join fournisseur where nu = 1 and np =1;
+
+[Q8]:	select NF from livraison where NU IN(001,002);
+
+[Q9]:	select nu from livraison where nf = 1 and quantite = 0;
+
+[Q10]:	 select NU from livraison where NF=1;
+
+[Q11]:	select distinct L.NF
+  2  From livraison L
+  3  WHERE EXISTS(
+  4  select NF from livraison where NF=1 and NP= L.NP and NU=L.NU);
+
+[Q12]:	select NU from livraison L1
+  2  where NF=3 and not EXISTS(
+  3  select NF from livraison L2 where L1.NU=L2.NU and L2.NF<>3
+  4  );
+
+[Q13]:	SELECT F.NomF, COUNT(L.NU) AS nbU 
+	FROM Fournisseur F JOIN Livraison L ON F.NF = L.NF 	
+	GROUP BY F.NF, F.NomF 	
+	ORDER BY COUNT(L.NU);
+
+[Q14]:	SELECT F.NomF
+	FROM Fournisseur F
+	JOIN Livraison L ON F.NF = L.NF
+	GROUP BY F.NomF
+	HAVING COUNT(DISTINCT L.NU) > 4;
+
+[Q15]:	SELECT P.NomP
+	FROM Produit P
+	JOIN Livraison L ON P.NP = L.NP
+	JOIN Usine U ON L.NU = U.NU
+	WHERE U.Ville = 'Agadir'
+	GROUP BY P.NomP
+	HAVING COUNT(DISTINCT L.NU) > 4;
+
+[Q16]:	SELECT UPPER(SUBSTR(P.NomP, 1, 1)) 
+	AS InitialeNomProduit, SUM(L.Quantite) AS QuantiteTotale
+	FROM Produit P
+	JOIN Livraison L ON P.NP = L.NP
+	GROUP BY UPPER(SUBSTR(P.NomP, 1, 1));
+
+[Q17]:	SELECT F.NomF
+	FROM Fournisseur F
+	WHERE NOT EXISTS (
+	SELECT U.NU
+	FROM Usine U
+	WHERE U.NU NOT IN (
+        SELECT L.NU
+        FROM Livraison L
+        WHERE L.NF = F.NF
+    )
+)
+ORDER BY F.NomF;
+
+
+	
+
+
+
